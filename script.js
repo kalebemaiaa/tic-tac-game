@@ -19,22 +19,22 @@ const drawSquare = () => {
     const tabuleiro = e.target.parentNode.children;
     for(let i = 0; i < tabuleiro.length; i++) {
       if(tabuleiro[i] === e.target){
+        // verifica se ja está preenchido
         if(tabuleiroGlobal[Math.floor(i/3)][i%3] != null) return;
         
         // verifica se ganhou
-        if(checkWinner()){
-          console.log("CABO");
-          return;
-        } 
+        if(checkWinner()) return;
 
         // marca no tabuleiro
         tabuleiroGlobal[Math.floor(i/3)][i%3] = jogador;
         
+        // desenha no tabuleiro
+        tabuleiro[i].appendChild(drawElement(jogador));
+
         // troca de jogador
         jogador = jogador ? false : true;
 
-        console.log(i, jogador, tabuleiroGlobal);
-        return;
+        if (checkWinner()) drawLine();
       }
     }
   })
@@ -44,17 +44,35 @@ const drawSquare = () => {
 const checkWinner = () => {
   for(let j = 0; j < 3; j++) {
     if(tabuleiroGlobal[j][j] == null) continue;
-    if((tabuleiroGlobal[j][0] === tabuleiroGlobal[j][1] && tabuleiroGlobal[j][1] === tabuleiroGlobal[j][2]) ||
-      (tabuleiroGlobal[0][j] === tabuleiroGlobal[1][j] && tabuleiroGlobal[1][j] === tabuleiroGlobal[2][j]))
-      return true;
+    let s = [0, 0];
+    for(let i = 0; i < 2; i++) {
+      if(tabuleiroGlobal[j][i] == tabuleiroGlobal[j][i + 1]) s[0]++;
+      if(tabuleiroGlobal[i][j] == tabuleiroGlobal[i + 1][j]) s[1]++;
+    }
+    if(s[0] == 2 || s[1] == 2) return true;
   }   
   
   if(tabuleiroGlobal[1][1] === null) return false;
+
   if((tabuleiroGlobal[0][0] === tabuleiroGlobal[1][1] && tabuleiroGlobal[1][1] === tabuleiroGlobal[2][2]) ||
     (tabuleiroGlobal[0][2] === tabuleiroGlobal[1][1] && tabuleiroGlobal[1][1] === tabuleiroGlobal[2][0]))
   return true;
 
   return false;
+}
+
+const drawElement = (team) => {
+  const letter = team ? "X" : "O";
+  const paragraph = document.createElement("p");
+  paragraph.textContent = letter;
+  paragraph.classList.add("letter");
+  return paragraph;
+}
+
+const drawLine = () => {
+  const line = document.createElement("div");
+  line.classList.add("line");
+  document.querySelector(".board").appendChild(line);
 }
 
 drawBoard();
